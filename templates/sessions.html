@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Cowrie Sessions</title>
+    
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1220;
+            color: #e5e7eb;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            padding: 0;
+            background: #111a2b;
+            border-right: 1px solid #26334d;
+            
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 45px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #20a4e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .logo span {
+            display: block;
+            margin-top: 4px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .section-title {
+            color: #7183a5;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            margin: 25px 12px 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 13px 14px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            background: #182642;
+            color: #60a5fa;
+        }
+
+        .nav-link.active {
+            background: #1b3767;
+            color: #38a8ff;
+            border-left: 3px solid #2196f3;
+        }
+
+        .logout {
+            position: absolute;
+            bottom: 25px;
+            left: 18px;
+            right: 18px;
+        }
+
+        .logout a {
+            color: #ff5c5c;
+        }
+
+        .page-wrapper {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        .content {
+            padding: 30px 42px;
+        }
+        
+        .topbar {
+            height: 70px;
+            background: #10192a;
+            border-bottom: 1px solid #243047;
+ 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 30px;
+        }
+
+        .topbar-title h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .topbar-title p {
+            margin: 3px 0 0;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 7px 12px;
+
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            border-radius: 20px;
+
+            color: #86efac;
+            font-size: 12px;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+
+            background: #22c55e;
+            border-radius: 50%;
+
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            padding-left: 15px;
+
+            border-left: 1px solid #243047;
+
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+
+            border-radius: 50%;
+
+            background: #3b82f6;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+            color: #f8fafc;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #7890b5;
+            font-size: 14px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #172238;
+            border: 1px solid #273653;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .card-label {
+            color: #7890b5;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-value {
+            margin-top: 12px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #f8fafc;
+        }
+
+        .panel {
+            background: #172238;
+            border: 1px solid #273653;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 22px;
+            border-bottom: 1px solid #273653;
+        }
+
+        .panel-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #f8fafc;
+        }
+
+        .panel-subtitle {
+            margin-top: 5px;
+            color: #7890b5;
+            font-size: 12px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #121c30;
+            color: #7890b5;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 15px 18px;
+        }
+
+        td {
+            padding: 17px 18px;
+            border-top: 1px solid #26334d;
+            color: #dbe4f0;
+            font-size: 13px;
+        }
+
+        tr:hover td {
+            background: #1a2942;
+        }
+
+        .session-id {
+    color: #60a5fa;
+    font-family: monospace;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.session-id:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+        .ip {
+            color: #8ecbff;
+            font-family: monospace;
+        }
+
+        .protocol {
+            text-transform: uppercase;
+        }
+
+        .severity {
+            display: inline-flex;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .severity-critical {
+            color: #ff5c5c;
+            background: rgba(255, 92, 92, 0.12);
+            border: 1px solid rgba(255, 92, 92, 0.25);
+        }
+
+        .severity-high {
+            color: #ff8a1f;
+            background: rgba(255, 138, 31, 0.12);
+            border: 1px solid rgba(255, 138, 31, 0.25);
+        }
+
+        .severity-medium {
+            color: #f2c94c;
+            background: rgba(242, 201, 76, 0.12);
+            border: 1px solid rgba(242, 201, 76, 0.25);
+        }
+
+        .severity-low {
+            color: #2ecc71;
+            background: rgba(46, 204, 113, 0.12);
+            border: 1px solid rgba(46, 204, 113, 0.25);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #64748b;
+            font-size: 11px;
+        }
+        
+                /* =========================================================
+           SESSION INVESTIGATION
+           ========================================================= */
+
+        .investigate-btn {
+            padding: 7px 12px;
+            border: 1px solid #31558f;
+            border-radius: 6px;
+            background: #162b4d;
+            color: #60a5fa;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .investigate-btn:hover {
+            background: #1d3b68;
+            color: #93c5fd;
+        }
+
+        .session-detail-row {
+            display: none;
+        }
+
+        .session-detail-row.open {
+            display: table-row;
+        }
+
+        .session-detail-panel {
+            padding: 22px;
+            background: #101a2d;
+            border-top: 1px solid #293a58;
+            border-bottom: 1px solid #293a58;
+        }
+
+        .session-detail-title {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .session-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.threat-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 10px;
+}
+
+.threat-summary-box {
+    background: #172238;
+    border: 1px solid #273653;
+    border-radius: 8px;
+    padding: 13px 14px;
+}
+
+.threat-summary-label {
+    color: #6f87aa;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+}
+
+.threat-summary-value {
+    margin-top: 6px;
+    color: #e5edf8;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.threat-summary-box.threat-box {
+    border-left: 3px solid #ef4444;
+}
+
+        .session-overview-box {
+            background: #172238;
+            border: 1px solid #273653;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .session-overview-label {
+            color: #6f87aa;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+
+        .session-overview-value {
+            margin-top: 6px;
+            color: #e5edf8;
+            font-size: 12px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .investigation-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 0.8fr;
+            gap: 16px;
+        }
+        
+                .attack-sequence {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 18px;
+            padding: 14px;
+            background: #172238;
+            border: 1px solid #273653;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .sequence-step {
+            flex: 1;
+            min-width: 130px;
+            padding: 10px 12px;
+            background: #101a2d;
+            border: 1px solid #273653;
+            border-radius: 7px;
+            text-align: center;
+        }
+
+        .sequence-step.active {
+            border-color: #31558f;
+            background: #162b4d;
+        }
+
+        .sequence-label {
+            color: #8da3c4;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .sequence-value {
+            margin-top: 5px;
+            color: #dce7f5;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sequence-arrow {
+            color: #4d6b94;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .investigation-box {
+            background: #172238;
+            border: 1px solid #273653;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .investigation-box-header {
+            padding: 13px 15px;
+            border-bottom: 1px solid #273653;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .timeline {
+            padding: 15px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+            position: relative;
+            padding-bottom: 16px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-marker {
+            width: 9px;
+            height: 9px;
+            margin-top: 4px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.10);
+        }
+
+        .timeline-content {
+            min-width: 0;
+        }
+
+        .timeline-event {
+            color: #dce7f5;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .timeline-time {
+            margin-top: 3px;
+            color: #6f87aa;
+            font-size: 10px;
+        }
+
+        .timeline-command {
+            margin-top: 5px;
+            color: #9db4d5;
+            font-family: monospace;
+            font-size: 10px;
+            word-break: break-word;
+        }
+
+        .analysis-list {
+            padding: 8px 15px 15px;
+        }
+
+        .analysis-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 11px 0;
+            border-bottom: 1px solid #273653;
+        }
+
+        .analysis-row:last-child {
+            border-bottom: none;
+        }
+
+        .analysis-label {
+            color: #8398b6;
+            font-size: 11px;
+        }
+
+        .analysis-value {
+            color: #e5edf8;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        @media (max-width: 1000px) {
+            .session-overview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .investigation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .threat-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                width: 190px;
+            }
+
+            .main {
+                margin-left: 190px;
+                padding: 25px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+/* =========================================================
+   STANDARD SIDEBAR
+   ========================================================= */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    width: 250px;
+    height: 100vh;
+
+    background: #111a2b;
+    border-right: 1px solid #243047;
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 1000;
+}
+
+.sidebar-logo {
+    padding: 24px 20px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    border-bottom: 1px solid #243047;
+}
+
+.sidebar-logo-icon {
+    width: 42px;
+    height: 42px;
+
+    background: linear-gradient(
+        135deg,
+        #3b82f6,
+        #22d3ee
+    );
+
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+}
+
+.sidebar-logo-text h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.sidebar-logo-text span {
+    display: block;
+    margin-top: 3px;
+
+    font-size: 11px;
+    color: #64748b;
+}
+
+.sidebar-nav {
+    padding: 20px 12px;
+    flex: 1;
+}
+
+.nav-section-title {
+    padding: 0 12px;
+    margin-bottom: 10px;
+
+    color: #64748b;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 12px 14px;
+    margin-bottom: 5px;
+
+    color: #94a3b8;
+
+    text-decoration: none;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+    background: #17233b;
+    color: #e5e7eb;
+}
+
+.nav-item.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+
+    border-left: 3px solid #3b82f6;
+}
+
+.nav-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.sidebar-bottom {
+    padding: 15px 12px;
+    border-top: 1px solid #243047;
+}
+
+.logout-link {
+    color: #f87171;
+}
+
+.logout-link:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+}
+
+/* =========================================================
+   TOP BAR
+   ========================================================= */
+
+.topbar {
+    height: 74px;
+    background: #10192a;
+    border-bottom: 1px solid #243047;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 32px;
+}
+
+.topbar-title h1 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.topbar-title p {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #7084a5;
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 14px;
+
+    border: 1px solid #1c4d3b;
+    border-radius: 20px;
+
+    color: #4ade80;
+    font-size: 12px;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+
+    background: #22c55e;
+    border-radius: 50%;
+
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+}
+
+.user-badge {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    padding-left: 15px;
+
+    border-left: 1px solid #243047;
+
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.user-avatar {
+    width: 34px;
+    height: 34px;
+
+    border-radius: 50%;
+
+    background: #3b82f6;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffffff;
+    font-weight: 700;
+}
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="sidebar-logo">
+
+        <div class="sidebar-logo-icon">
+            🛡
+        </div>
+
+        <div class="sidebar-logo-text">
+            <h2>Cowrie</h2>
+            <span>Threat Monitoring</span>
+        </div>
+
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <div class="nav-section-title">
+            Monitoring
+        </div>
+
+        <a href="/" class="nav-item">
+            <span class="nav-icon">▣</span>
+            Dashboard
+        </a>
+
+        <a href="/attack-activity" class="nav-item">
+            <span class="nav-icon">⚠</span>
+            Attack Activity
+        </a>
+
+        <a href="/sessions" class="nav-item active">
+            <span class="nav-icon">◉</span>
+            Sessions
+        </a>
+
+        <a href="/analytics" class="nav-item">
+            <span class="nav-icon">⌁</span>
+            Analytics
+        </a>
+        
+        <a href="/alerts" class="nav-item">
+    <span class="nav-icon">⚠</span>
+    Alerts
+</a>
+        
+        <div class="nav-section-title" style="margin-top:25px;">
+    Reporting
+</div>
+
+<a href="/reports" class="nav-item">
+    <span class="nav-icon">▤</span>
+    Reports
+</a>
+
+        <div class="nav-section-title" style="margin-top: 25px;">
+            System
+        </div>
+
+        {% if session.get("role") == "admin" %}
+        <a href="/settings" class="nav-item">
+            <span class="nav-icon">⚙</span>
+            Settings
+        </a>
+        {% endif %}
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+        <a href="/logout" class="nav-item logout-link">
+            <span class="nav-icon">↪</span>
+            Logout
+        </a>
+
+    </div>
+
+</aside>
+
+<div class="page-wrapper">
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+        <div class="topbar-title">
+
+            <h1>Sessions</h1>
+
+            <p>
+                Honeypot-Based Threat Monitoring &amp; Intrusion Analysis System
+            </p>
+
+        </div>
+
+
+        <div class="user-area">
+
+            <div class="status-indicator">
+
+                <span class="status-dot"></span>
+
+                System Online
+
+            </div>
+
+
+            <div class="user-badge">
+
+                <div class="user-avatar">
+                    {{ username[0]|upper }}
+                </div>
+
+                <span>
+    <strong>{{ username }}</strong>
+    <small style="display:block; color:#7890b5; margin-top:2px;">
+        {{ role|capitalize }}
+    </small>
+</span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+<!-- MAIN CONTENT -->
+
+<main class="content">
+
+
+    <div class="page-header">
+
+        <h1>
+            Sessions
+        </h1>
+
+        <p>
+            Monitor and investigate individual SSH sessions collected by the Cowrie honeypot.
+        </p>
+
+    </div>
+
+
+
+    <!-- SUMMARY CARDS -->
+
+    <div class="cards">
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Total Sessions
+            </div>
+
+            <div class="card-value">
+                {{ sessions|length }}
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Total Events
+            </div>
+
+            <div class="card-value">
+
+                {% set total_events = namespace(value=0) %}
+
+                {% for item in sessions %}
+
+                    {% set total_events.value =
+                        total_events.value + item.event_count %}
+
+                {% endfor %}
+
+                {{ total_events.value }}
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                High Risk Sessions
+            </div>
+
+            <div class="card-value">
+
+                {% set high_risk = namespace(value=0) %}
+
+                {% for item in sessions %}
+
+                    {% if item.severity in ["Critical", "High"] %}
+
+                        {% set high_risk.value =
+                            high_risk.value + 1 %}
+
+                    {% endif %}
+
+                {% endfor %}
+
+                {{ high_risk.value }}
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+        <!-- SESSION ACTIVITY -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <div class="panel-title">
+                    SSH Session Activity
+                </div>
+
+                <div class="panel-subtitle">
+                    Select a session to investigate the complete SSH activity sequence.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Session ID</th>
+                        <th>Source IP</th>
+                        <th>Protocol</th>
+                        <th>Start Time</th>
+                        <th>Last Activity</th>
+                        <th>Events</th>
+                        <th>Severity</th>
+                        <th>Investigation</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for item in sessions %}
+
+                    <tr>
+
+                        <td>
+
+                            <a href="/session/{{ item.session_id }}" class="session-id">
+                                {{ item.session_id }}
+                            </a>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="ip">
+                                {{ item.src_ip or "N/A" }}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="protocol">
+                                {{ item.protocol or "SSH" }}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+                            {{ item.start_time }}
+                        </td>
+
+
+                        <td>
+                            {{ item.last_activity }}
+                        </td>
+
+
+                        <td>
+                            {{ item.event_count }}
+                        </td>
+
+
+                        <td>
+
+                            <span class="severity severity-{{ item.severity|lower }}">
+                                {{ item.severity }}
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <button
+                                type="button"
+                                class="investigate-btn"
+                                onclick="toggleSession('session-{{ loop.index }}', this)">
+
+                                Investigate
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- SESSION INVESTIGATION -->
+
+                    <tr id="session-{{ loop.index }}" class="session-detail-row">
+
+                        <td colspan="8">
+
+                            <div class="session-detail-panel">
+
+                                <div class="session-detail-title">
+                                    Session Investigation — {{ item.session_id }}
+                                </div>
+
+
+                                <!-- SESSION OVERVIEW -->
+
+<div class="session-overview-grid">
+
+    <div class="session-overview-box">
+
+        <div class="session-overview-label">
+            Source IP
+        </div>
+
+        <div class="session-overview-value">
+            {{ item.src_ip or "N/A" }}
+        </div>
+
+    </div>
+
+
+    <div class="session-overview-box">
+
+        <div class="session-overview-label">
+            Protocol
+        </div>
+
+        <div class="session-overview-value">
+            {{ item.protocol or "SSH" }}
+        </div>
+
+    </div>
+
+
+    <div class="session-overview-box">
+
+        <div class="session-overview-label">
+            Duration
+        </div>
+
+        <div class="session-overview-value">
+            {{ item.duration }}
+        </div>
+
+    </div>
+
+
+    <div class="session-overview-box">
+
+        <div class="session-overview-label">
+            Start Time
+        </div>
+
+        <div class="session-overview-value">
+            {{ item.start_time }}
+        </div>
+
+    </div>
+
+
+    <div class="session-overview-box">
+
+        <div class="session-overview-label">
+            Last Activity
+        </div>
+
+        <div class="session-overview-value">
+            {{ item.last_activity }}
+        </div>
+
+    </div>
+
+
+    <div class="session-overview-box">
+
+        <div class="session-overview-label">
+            Total Events
+        </div>
+
+        <div class="session-overview-value">
+            {{ item.event_count }}
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- THREAT SUMMARY -->
+
+<div class="threat-summary">
+
+    <div class="threat-summary-box">
+
+        <div class="threat-summary-label">
+            Critical Events
+        </div>
+
+        <div class="threat-summary-value">
+            {{ item.critical_event_count }} event(s)
+        </div>
+
+    </div>
+
+
+    <div class="threat-summary-box">
+
+        <div class="threat-summary-label">
+            Session Status
+        </div>
+
+        <div class="threat-summary-value">
+            {{ item.session_status }}
+        </div>
+
+    </div>
+
+
+    <div class="threat-summary-box threat-box">
+
+        <div class="threat-summary-label">
+            Threat Classification
+        </div>
+
+        <div class="threat-summary-value">
+
+            <span class="severity severity-{{ item.severity|lower }}">
+                {{ item.severity }}
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+                                <!-- INVESTIGATION -->
+                                
+                                <!-- ATTACK SEQUENCE -->
+
+<div class="attack-sequence">
+
+    <div class="sequence-step active">
+
+        <div class="sequence-label">
+            Phase 1
+        </div>
+
+        <div class="sequence-value">
+            Connection
+        </div>
+
+    </div>
+
+
+    <div class="sequence-arrow">
+        →
+    </div>
+
+
+    <div class="sequence-step active">
+
+        <div class="sequence-label">
+            Phase 2
+        </div>
+
+        <div class="sequence-value">
+
+            {% if item.events | selectattr("event_id", "equalto", "cowrie.login.success") | list
+                  or item.events | selectattr("event_id", "equalto", "cowrie.login.failed") | list %}
+                Authentication
+            {% else %}
+                Not Detected
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="sequence-arrow">
+        →
+    </div>
+
+
+    <div class="sequence-step active">
+
+        <div class="sequence-label">
+            Phase 3
+        </div>
+
+        <div class="sequence-value">
+
+            {% if item.events | selectattr("event_id", "equalto", "cowrie.command.input") | list %}
+                Command Activity
+            {% else %}
+                Not Detected
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="sequence-arrow">
+        →
+    </div>
+
+
+    <div class="sequence-step active">
+
+        <div class="sequence-label">
+            Phase 4
+        </div>
+
+        <div class="sequence-value">
+
+            {% set recon_commands = item.events
+                | selectattr("command")
+                | list %}
+
+            {% if item.events | selectattr("severity", "equalto", "Critical") | list %}
+                Critical Event Detected
+            {% elif recon_commands %}
+                Activity Observed
+            {% else %}
+                Not Detected
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="sequence-arrow">
+        →
+    </div>
+
+
+    <div class="sequence-step active">
+
+        <div class="sequence-label">
+            Phase 5
+        </div>
+
+        <div class="sequence-value">
+
+            {% if item.session_status == "Closed" %}
+                Session Closed
+            {% else %}
+                Session Recorded
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+                                <div class="investigation-grid">
+
+
+                                    <!-- TIMELINE -->
+
+                                    <div class="investigation-box">
+
+                                        <div class="investigation-box-header">
+                                            Attack Timeline
+                                        </div>
+
+
+                                        <div class="timeline">
+
+                                            {% for event in item.events %}
+
+                                            <div class="timeline-item">
+
+                                                <div class="timeline-marker"></div>
+
+                                                <div class="timeline-content">
+
+                                                    <div class="timeline-event">
+
+    {% if event.event_id == "cowrie.login.success" %}
+
+        Successful Authentication
+
+    {% elif event.event_id == "cowrie.login.failed" %}
+
+        Failed Authentication Attempt
+
+    {% elif event.event_id == "cowrie.command.input" %}
+
+        Command Execution
+
+    {% elif event.event_id == "cowrie.command.failed" %}
+
+        Command Execution Failed
+
+    {% elif event.event_id == "cowrie.session.connect" %}
+
+        Session Connection
+
+    {% elif event.event_id == "cowrie.session.closed" %}
+
+        Session Closed
+
+    {% else %}
+
+        {{ event.event_id }}
+
+    {% endif %}
+
+
+    <span class="severity severity-{{ event.severity|lower }}"
+          style="margin-left:6px;">
+
+        {{ event.severity }}
+
+    </span>
+
+</div>
+
+
+                                                    <div class="timeline-time">
+
+                                                        {{ event.timestamp }}
+
+                                                    </div>
+
+
+                                                    {% if event.command %}
+
+                                                    <div class="timeline-command">
+
+                                                        $ {{ event.command }}
+
+                                                    </div>
+
+                                                    {% endif %}
+
+                                                </div>
+
+                                            </div>
+
+                                            {% endfor %}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- SESSION ANALYSIS -->
+
+                                    <div class="investigation-box">
+
+                                        <div class="investigation-box-header">
+                                            Session Analysis
+                                        </div>
+
+
+                                        <div class="analysis-list">
+
+                                            <div class="analysis-row">
+
+                                                <span class="analysis-label">
+                                                    Authentication
+                                                </span>
+
+                                                <span class="analysis-value">
+
+                                                    {% if item.events | selectattr("event_id", "equalto", "cowrie.login.success") | list %}
+                                                        Successful
+                                                    {% else %}
+                                                        Not Detected
+                                                    {% endif %}
+
+                                                </span>
+
+                                            </div>
+
+
+                                            <div class="analysis-row">
+
+                                                <span class="analysis-label">
+                                                    Failed Login Activity
+                                                </span>
+
+                                                <span class="analysis-value">
+
+                                                    {% if item.events | selectattr("event_id", "equalto", "cowrie.login.failed") | list %}
+                                                        Detected
+                                                    {% else %}
+                                                        Not Detected
+                                                    {% endif %}
+
+                                                </span>
+
+                                            </div>
+
+
+                                            <div class="analysis-row">
+
+                                                <span class="analysis-label">
+                                                    Command Activity
+                                                </span>
+
+                                                <span class="analysis-value">
+
+                                                    {% set command_events = item.events | selectattr("event_id", "equalto", "cowrie.command.input") | list %}
+
+                                                    {{ command_events|length }} event(s)
+
+                                                </span>
+
+                                            </div>
+
+
+                                            <div class="analysis-row">
+
+                                                <span class="analysis-label">
+    Critical Events
+</span>
+
+<span class="analysis-value">
+    {{ item.critical_event_count }} event(s)
+</span>
+
+                                            </div>
+
+
+                                            <div class="analysis-row">
+
+                                                <span class="analysis-label">
+                                                    Session Status
+                                                </span>
+
+                                                <span class="analysis-value">
+                                                    {{ item.session_status }}
+                                                </span>
+
+                                            </div>
+
+
+                                            <div class="analysis-row">
+
+                                                <span class="analysis-label">
+                                                    Threat Classification
+                                                </span>
+
+                                                <span class="analysis-value">
+                                                    {{ item.severity }}
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="8">
+
+                            <div class="empty">
+                                No honeypot sessions recorded yet.
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="footer">
+
+        Cowrie Threat Monitoring & Intrusion Analysis System<br>
+
+        Honeypot Monitoring Platform
+
+    </div>
+
+
+</main>
+
+</div>
+
+<script>
+
+function toggleSession(sessionId, button) {
+
+    const row = document.getElementById(sessionId);
+
+    if (row.classList.contains("open")) {
+
+        row.classList.remove("open");
+        button.textContent = "Investigate";
+
+    } else {
+
+        row.classList.add("open");
+        button.textContent = "Close Investigation";
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>

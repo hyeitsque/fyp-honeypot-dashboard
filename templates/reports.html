@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reports - Cowrie Threat Monitoring</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .main-content {
+            margin-left: 250px;
+            min-height: 100vh;
+            padding: 0 34px 60px;
+        }
+
+        .topbar {
+            margin: 0 -34px;
+            padding: 0 30px;
+            height: 70px;
+            background: #10192a;
+            border-bottom: 1px solid #243047;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-header {
+            padding-top: 30px;
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            font-size: 26px;
+            color: #ffffff;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #7890b5;
+            font-size: 14px;
+        }
+
+        /* REPORT BUILDER */
+        .report-builder {
+            display: grid;
+            grid-template-columns: 330px minmax(0, 1fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .config-card,
+        .preview-card {
+            background: #18243b;
+            border: 1px solid #293a58;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .card-title {
+            padding: 18px 20px;
+            border-bottom: 1px solid #293a58;
+        }
+
+        .card-title h2 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 17px;
+        }
+
+        .card-title p {
+            margin: 5px 0 0;
+            color: #7890b5;
+            font-size: 12px;
+        }
+
+        .config-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a9bdd9;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .select-box {
+            width: 100%;
+            padding: 11px 12px;
+            background: #0e1728;
+            border: 1px solid #293a58;
+            border-radius: 7px;
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .select-box:focus {
+            border-color: #3b82f6;
+        }
+
+        .report-type {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .type-option {
+            display: block;
+            padding: 12px;
+            background: #101a2d;
+            border: 1px solid #293a58;
+            border-radius: 7px;
+            color: #d7e3f4;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .type-option:hover {
+            border-color: #3b82f6;
+            background: #14223b;
+        }
+
+        .type-option input {
+            margin-right: 8px;
+        }
+
+        .type-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .type-description {
+            display: block;
+            margin-top: 4px;
+            margin-left: 20px;
+            color: #7084a5;
+            font-size: 11px;
+        }
+
+        .check-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #b9c9df;
+            font-size: 13px;
+        }
+
+        .check-item input {
+            accent-color: #3b82f6;
+        }
+
+        .generate-button {
+            width: 100%;
+            border: none;
+            padding: 12px 15px;
+            background: #2563eb;
+            color: #ffffff;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .generate-button:hover {
+            background: #1d4ed8;
+        }
+
+        .secondary-button {
+            width: 100%;
+            margin-top: 9px;
+            padding: 11px 15px;
+            background: transparent;
+            color: #9db4d5;
+            border: 1px solid #293a58;
+            border-radius: 7px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .secondary-button:hover {
+            background: #101a2d;
+            color: #ffffff;
+        }
+
+        /* REPORT PREVIEW */
+        .preview-toolbar {
+            padding: 14px 18px;
+            border-bottom: 1px solid #293a58;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-toolbar span {
+            color: #7890b5;
+            font-size: 12px;
+        }
+
+        .print-button {
+            padding: 7px 12px;
+            border: 1px solid #3b82f6;
+            background: transparent;
+            color: #60a5fa;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .print-button:hover {
+            background: rgba(59, 130, 246, 0.12);
+        }
+
+        .report-paper {
+            margin: 20px;
+            padding: 32px;
+            background: #f8fafc;
+            color: #172033;
+            border-radius: 5px;
+            min-height: 700px;
+            counter-reset: report-section;
+        }
+
+        .report-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid #d9e2ef;
+        }
+
+        .report-logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: #2563eb;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .report-logo h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .report-logo span {
+            display: block;
+            margin-top: 2px;
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        .report-title {
+            margin-top: 28px;
+        }
+
+        .report-title h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .report-title p {
+            margin: 6px 0 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .report-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .meta-box {
+            padding: 12px;
+            background: #eef3f9;
+            border: 1px solid #d9e2ef;
+            border-radius: 5px;
+        }
+
+        .meta-label {
+            color: #64748b;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+
+        .meta-value {
+            margin-top: 5px;
+            color: #172033;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .report-section {
+            margin-top: 28px;
+        }
+
+        .report-section h3 {
+            margin: 0 0 10px;
+            font-size: 15px;
+        }
+        
+        .report-section h3::before {
+    counter-increment: report-section;
+    content: counter(report-section) ". ";
+}
+
+        .report-section p {
+            margin: 0;
+            line-height: 1.6;
+            color: #475569;
+            font-size: 12px;
+        }
+        
+        /* EXECUTIVE SUMMARY */
+
+.executive-summary {
+    margin-top: 20px;
+    padding: 14px;
+    background: #f1f5f9;
+    border: 1px solid #d9e2ef;
+    border-radius: 6px;
+}
+
+.executive-summary h3 {
+    font-size: 14px !important;
+}
+
+.executive-intro {
+    font-size: 14px !important;
+    line-height: 1.45 !important;
+}
+
+.executive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.executive-header h3 {
+    margin: 0 !important;
+}
+
+.executive-header h3::before {
+    counter-increment: report-section;
+    content: counter(report-section) ". ";
+}
+
+.executive-status {
+    padding: 4px 9px;
+    background: #e8f1ff;
+    color: #2563eb;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.executive-intro {
+    margin-bottom: 10px !important;
+}
+
+.executive-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7px;
+    margin-top: 10px;
+}
+
+.executive-metric {
+    padding: 11px;
+    background: #ffffff;
+    border: 1px solid #d9e2ef;
+    border-radius: 5px;
+}
+
+.executive-metric-label {
+    color: #64748b;
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.executive-metric-value {
+    margin-top: 5px;
+    color: #172033;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.executive-metric-detail {
+    margin-top: 2px;
+    color: #94a3b8;
+    font-size: 9px;
+}
+
+.executive-observation {
+    margin-top: 10px;
+    padding: 9px 11px;
+    background: #ffffff;
+    border: 1px solid #d9e2ef;
+    border-radius: 5px;
+}
+
+.executive-observation-title {
+    margin-bottom: 5px;
+    color: #334155;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.executive-observation p {
+    margin: 0 !important;
+    font-size: 11px !important;
+    line-height: 1.55 !important;
+}
+
+@media (max-width: 700px) {
+    .executive-metrics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .summary-item {
+            padding: 13px;
+            background: #eef3f9;
+            border: 1px solid #d9e2ef;
+            border-radius: 5px;
+        }
+
+        .summary-item strong {
+            display: block;
+            font-size: 17px;
+        }
+
+        .summary-item span {
+            color: #64748b;
+            font-size: 10px;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 11px;
+        }
+
+        .report-table th {
+            padding: 9px;
+            background: #e7edf5;
+            color: #475569;
+            text-align: left;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+
+        .report-table td {
+            padding: 9px;
+            border-bottom: 1px solid #d9e2ef;
+            color: #334155;
+        }
+
+        .severity-text {
+            font-weight: 700;
+        }
+
+        .critical-text {
+            color: #dc2626;
+        }
+
+        .high-text {
+            color: #ea580c;
+        }
+
+        .medium-text {
+            color: #ca8a04;
+        }
+
+        .low-text {
+            color: #16a34a;
+        }
+
+        .report-footer {
+            margin-top: 35px;
+            padding-top: 14px;
+            border-top: 1px solid #d9e2ef;
+            color: #94a3b8;
+            font-size: 9px;
+            text-align: center;
+        }
+
+        @media (max-width: 1000px) {
+            .report-builder {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            body {
+                background: white !important;
+            }
+
+            .sidebar,
+            .topbar,
+            .page-header,
+            .config-card,
+            .preview-toolbar {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+            }
+
+            .preview-card {
+                border: none;
+                background: white;
+            }
+
+            .report-paper {
+                margin: 0;
+                border-radius: 0;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">🛡</div>
+
+            <div class="sidebar-logo-text">
+                <h2>Cowrie</h2>
+                <span>Threat Monitoring</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section-title">Monitoring</div>
+
+            <a href="/" class="nav-item">
+                <span class="nav-icon">▣</span>
+                Dashboard
+            </a>
+
+            <a href="/attack-activity" class="nav-item">
+                <span class="nav-icon">⚠</span>
+                Attack Activity
+            </a>
+
+            <a href="/sessions" class="nav-item">
+                <span class="nav-icon">◉</span>
+                Sessions
+            </a>
+
+            <a href="/analytics" class="nav-item">
+                <span class="nav-icon">⌁</span>
+                Analytics
+            </a>
+            
+            <a href="/alerts" class="nav-item">
+    <span class="nav-icon">⚠</span>
+    Alerts
+</a>
+
+            <div class="nav-section-title" style="margin-top:25px;">
+                Reporting
+            </div>
+
+            <a href="/reports" class="nav-item active">
+                <span class="nav-icon">▤</span>
+                Reports
+            </a>
+
+            {% if session.get("role") == "admin" %}
+            <div class="nav-section-title" style="margin-top:25px;">
+                System
+            </div>
+
+            <a href="/settings" class="nav-item">
+                <span class="nav-icon">⚙</span>
+                Settings
+            </a>
+            {% endif %}
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="/logout" class="nav-item logout-link">
+                <span class="nav-icon">↪</span>
+                Logout
+            </a>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="topbar-title">
+                <h1>Security Reports</h1>
+                <p>Honeypot-Based Threat Monitoring &amp; Intrusion Analysis System</p>
+            </div>
+
+            <div class="user-area">
+
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    System Online
+                </div>
+
+                <div class="user-badge">
+
+                    <div class="user-avatar">
+                        {{ username[0]|upper }}
+                    </div>
+
+                    <span>
+    <strong>{{ username }}</strong>
+    <small style="display:block; color:#7890b5; margin-top:2px;">
+        {{ role|capitalize }}
+    </small>
+</span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+
+            <h1>Security Report Builder</h1>
+
+            <p>
+                Generate structured security reports from collected Cowrie honeypot data.
+            </p>
+
+        </div>
+
+
+        <!-- REPORT BUILDER -->
+        <div class="report-builder">
+
+
+            <!-- CONFIGURATION -->
+            <div class="config-card">
+
+                <div class="card-title">
+
+                    <h2>Report Configuration</h2>
+
+                    <p>Select the information to include in your report.</p>
+
+                </div>
+
+
+                <div class="config-body">
+                
+                <form method="GET" action="{{ url_for('reports') }}">
+
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            Report Type
+                        </label>
+
+                        <div class="report-type">
+
+                            <label class="type-option">
+
+                                <input type="radio"
+                                    name="report_type"
+                                    value="summary"
+                                    {% if report_type == "summary" %}checked{% endif %}>
+
+                                <span class="type-name">
+                                    Security Summary
+                                </span>
+
+                                <span class="type-description">
+                                    Overall honeypot activity and threat summary.
+                                </span>
+
+                            </label>
+
+
+                            <label class="type-option">
+
+                                <input type="radio"
+                                       name="report_type"
+                                       value="incident"
+                                       {% if report_type == "incident" %}checked{% endif %}>
+
+                                <span class="type-name">
+                                    Incident Report
+                                </span>
+
+                                <span class="type-description">
+                                    Detailed report for suspicious activity.
+                                </span>
+
+                            </label>
+
+
+                            <label class="type-option">
+
+                                <input type="radio"
+                                       name="report_type"
+                                       value="session"
+                                       {% if report_type == "session" %}checked{% endif %}>
+
+                                <span class="type-name">
+                                    Session Report
+                                </span>
+
+                                <span class="type-description">
+                                    Detailed analysis of a selected SSH session.
+                                </span>
+
+                            </label>
+
+                        </div>
+                        
+    
+
+                    </div>
+
+
+                    <div class="form-group">
+
+    <label class="form-label">
+        Reporting Period
+    </label>
+
+    <select class="select-box" name="period">
+        <option value="all" {% if period == "all" %}selected{% endif %}>
+            All Recorded Events
+        </option>
+
+        <option value="24h" {% if period == "24h" %}selected{% endif %}>
+            Last 24 Hours
+        </option>
+
+        <option value="7d" {% if period == "7d" %}selected{% endif %}>
+            Last 7 Days
+        </option>
+
+        <option value="30d" {% if period == "30d" %}selected{% endif %}>
+            Last 30 Days
+        </option>
+    </select>
+
+</div>
+
+
+<div class="form-group">
+
+    <label class="form-label">
+        SSH Session
+    </label>
+
+    <select class="select-box" name="session_id">
+
+        {% for session in session_list %}
+
+        <option value="{{ session.session_id }}"
+            {% if selected_session == session.session_id %}selected{% endif %}>
+            {{ session.session_id }}
+        </option>
+
+        {% else %}
+
+        <option value="">
+            No sessions available
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+</div>
+
+
+
+                    <div class="form-group">
+
+    <label class="form-label">
+        Include Sections
+    </label>
+
+    <div class="check-list">
+
+        <label class="check-item">
+            <input type="checkbox"
+                   name="section"
+                   value="executive_summary"
+                   {% if "executive_summary" in included_sections %}checked{% endif %}>
+            Executive Summary
+        </label>
+
+        <label class="check-item">
+            <input type="checkbox"
+                   name="section"
+                   value="attack_type"
+                   {% if "attack_type" in included_sections %}checked{% endif %}>
+            Attack Type Analysis
+        </label>
+
+        <label class="check-item">
+            <input type="checkbox"
+                   name="section"
+                   value="threat_severity"
+                   {% if "threat_severity" in included_sections %}checked{% endif %}>
+            Threat Summary
+        </label>
+
+        <label class="check-item">
+    <input type="checkbox"
+           name="section"
+           value="attack_sources"
+           {% if "attack_sources" in included_sections %}checked{% endif %}>
+    Top Attack Sources
+</label>
+
+<label class="check-item">
+    <input type="checkbox"
+           name="section"
+           value="event_summary"
+           {% if "event_summary" in included_sections %}checked{% endif %}>
+    Event Summary
+</label>
+
+        <label class="check-item">
+            <input type="checkbox"
+                   name="section"
+                   value="commands"
+                   {% if "commands" in included_sections %}checked{% endif %}>
+            Most Executed Commands
+        </label>
+
+        <label class="check-item">
+            <input type="checkbox"
+                   name="section"
+                   value="evidence"
+                   {% if "evidence" in included_sections %}checked{% endif %}>
+            Evidence
+        </label>
+
+    </div>
+
+</div>
+
+                    
+
+
+                    <button type="submit" class="generate-button">
+                        Generate Report
+                    </button>
+                    
+                </form>
+
+                    <button class="secondary-button"
+                            onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                        Preview Report
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- PREVIEW -->
+            <div class="preview-card">
+
+                <div class="preview-toolbar">
+
+                    <span>
+                        Live Report Preview
+                    </span>
+
+                    <button class="print-button"
+                            onclick="window.print()">
+                        Print / Save PDF
+                    </button>
+
+                </div>
+
+
+                <div class="report-paper">
+
+
+                    <!-- REPORT HEADER -->
+                    <div class="report-logo">
+
+                        <div class="report-logo-icon">
+                            🛡
+                        </div>
+
+                        <div>
+                            <h2>COWRIE HONEYPOT</h2>
+                            <span>Threat Monitoring &amp; Intrusion Analysis System</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="report-title">
+
+                        <h1>{{ report_title }}</h1>
+
+                        <p>
+                            Generated from recorded Cowrie honeypot activity.
+                        </p>
+
+                    </div>
+
+
+                    <!-- REPORT META -->
+                    <div class="report-meta">
+
+                        <div class="meta-box">
+                            <div class="meta-label">
+                                Reporting Period
+                            </div>
+
+                            <div class="meta-value">
+    {% if period == "24h" %}
+        Last 24 Hours
+    {% elif period == "7d" %}
+        Last 7 Days
+    {% elif period == "30d" %}
+        Last 30 Days
+    {% else %}
+        All Recorded Events
+    {% endif %}
+</div>
+                        </div>
+
+
+                        <div class="meta-box">
+                            <div class="meta-label">
+                                Total Events
+                            </div>
+
+                            <div class="meta-value">
+                                {{ total_events }}
+                            </div>
+                        </div>
+
+
+                        <div class="meta-box">
+                            <div class="meta-label">
+                                Total Sessions
+                            </div>
+
+                            <div class="meta-value">
+                                {{ total_sessions }}
+                            </div>
+                        </div>
+
+                    </div>
+
+{% if report_type == "summary" and "executive_summary" in included_sections %}
+
+<div class="executive-summary">
+
+    <div class="executive-header">
+
+        <h3>Executive Summary</h3>
+
+        <span class="executive-status">
+            Security Overview
+        </span>
+
+    </div>
+
+
+    <p class="executive-intro">
+        This report provides an overview of security activity captured by
+        the Cowrie honeypot during the selected reporting period. The
+        collected events are analyzed based on session activity, severity,
+        source information and observed attacker commands.
+    </p>
+
+
+    <div class="executive-metrics">
+
+        <div class="executive-metric">
+            <div class="executive-metric-label">Total Events</div>
+            <div class="executive-metric-value">
+                {{ total_events }}
+            </div>
+            <div class="executive-metric-detail">
+                Recorded activities
+            </div>
+        </div>
+
+
+        <div class="executive-metric">
+            <div class="executive-metric-label">Total Sessions</div>
+            <div class="executive-metric-value">
+                {{ total_sessions }}
+            </div>
+            <div class="executive-metric-detail">
+                Observed SSH sessions
+            </div>
+        </div>
+
+
+        <div class="executive-metric">
+            <div class="executive-metric-label">Critical Events</div>
+            <div class="executive-metric-value">
+                {{ severity_counts["Critical"] }}
+            </div>
+            <div class="executive-metric-detail">
+                Highest severity
+            </div>
+        </div>
+
+
+        <div class="executive-metric">
+            <div class="executive-metric-label">High Events</div>
+            <div class="executive-metric-value">
+                {{ severity_counts["High"] }}
+            </div>
+            <div class="executive-metric-detail">
+                High severity
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="executive-observation">
+
+        <div class="executive-observation-title">
+            Security Observation
+        </div>
+
+        <p>
+
+    During the reporting period, the system recorded
+    <strong>{{ total_events }}</strong> events across
+    <strong>{{ total_sessions }}</strong> SSH sessions.
+
+    {% set observed_activities = [] %}
+
+    {% if attack_type_counts["Authentication Activity"] > 0 %}
+        {% set _ = observed_activities.append(
+            "Authentication Activity (" ~
+            attack_type_counts["Authentication Activity"] ~
+            ")"
+        ) %}
+    {% endif %}
+
+    {% if attack_type_counts["Reconnaissance Activity"] > 0 %}
+        {% set _ = observed_activities.append(
+            "Reconnaissance Activity (" ~
+            attack_type_counts["Reconnaissance Activity"] ~
+            ")"
+        ) %}
+    {% endif %}
+
+    {% if attack_type_counts["Command Execution"] > 0 %}
+        {% set _ = observed_activities.append(
+            "Command Execution (" ~
+            attack_type_counts["Command Execution"] ~
+            ")"
+        ) %}
+    {% endif %}
+
+    {% if attack_type_counts["File / Download Activity"] > 0 %}
+        {% set _ = observed_activities.append(
+            "File / Download Activity (" ~
+            attack_type_counts["File / Download Activity"] ~
+            ")"
+        ) %}
+    {% endif %}
+
+    {% if attack_type_counts["Privilege / Account Activity"] > 0 %}
+        {% set _ = observed_activities.append(
+            "Privilege / Account Activity (" ~
+            attack_type_counts["Privilege / Account Activity"] ~
+            ")"
+        ) %}
+    {% endif %}
+
+    {% if attack_type_counts["Potential Shell Activity"] > 0 %}
+        {% set _ = observed_activities.append(
+            "Potential Shell Activity (" ~
+            attack_type_counts["Potential Shell Activity"] ~
+            ")"
+        ) %}
+    {% endif %}
+
+    Observed activity included
+    {{ observed_activities | join(", ") }}.
+
+    <br><br>
+
+    The collected events were classified according to their observed
+    behavior and severity to support further investigation through
+    the monitoring dashboard.
+
+</p>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+{% if report_type == "incident" %}
+
+<div class="report-section">
+
+    <h3>Incident Summary</h3>
+
+    <p>
+        This report focuses on recorded events classified as Critical or High
+        severity during the selected reporting period.
+    </p>
+
+</div>
+
+
+<div class="report-section">
+
+    <h3>High-Risk Events</h3>
+
+    <table class="report-table">
+
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Source IP</th>
+                <th>Event</th>
+                <th>Command</th>
+                <th>Severity</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for event in incident_events %}
+
+            <tr>
+
+                <td>{{ event.timestamp }}</td>
+
+                <td>{{ event.src_ip or "N/A" }}</td>
+
+                <td>{{ event.event_id }}</td>
+
+                <td>{{ event.command or "-" }}</td>
+
+                <td class="severity-text
+                    {% if event.severity == 'Critical' %}
+                        critical-text
+                    {% else %}
+                        high-text
+                    {% endif %}">
+                    {{ event.severity }}
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+                <td colspan="5">
+                    No Critical or High severity events were recorded
+                    during this reporting period.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<div class="report-section">
+
+    <h3>Incident Assessment</h3>
+
+    <p>
+        The listed events require further review based on their severity
+        classification and observed activity. Related event details and
+        session information can be examined through the Event Investigation
+        interface.
+    </p>
+
+</div>
+
+{% endif %}
+
+{% if report_type == "session" %}
+
+<div class="report-section">
+
+    <h3>Session Overview</h3>
+
+    <p>
+        This report presents the chronological activity recorded during
+        the selected Cowrie SSH session.
+    </p>
+
+</div>
+
+
+<div class="report-section">
+
+    <h3>Session Information</h3>
+
+    <table class="report-table">
+
+        <tr>
+            <th>Session ID</th>
+            <td>{{ selected_session or "N/A" }}</td>
+        </tr>
+
+        {% if session_events %}
+
+        <tr>
+            <th>Source IP</th>
+            <td>{{ session_events[0].src_ip or "N/A" }}</td>
+        </tr>
+
+        <tr>
+            <th>Total Events</th>
+            <td>{{ session_events|length }}</td>
+        </tr>
+
+        <tr>
+            <th>Protocol</th>
+            <td>{{ session_events[0].protocol or "SSH" }}</td>
+        </tr>
+
+        {% endif %}
+
+    </table>
+
+</div>
+
+
+<div class="report-section">
+
+    <h3>Session Activity Timeline</h3>
+
+    <table class="report-table">
+
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Event</th>
+                <th>Command</th>
+                <th>Severity</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for event in session_events %}
+
+            <tr>
+
+                <td>{{ event.timestamp }}</td>
+
+                <td>{{ event.event_id }}</td>
+
+                <td>{{ event.command or "-" }}</td>
+
+                <td>
+                    {% set session_severity =
+                        get_threat_severity(
+                            event.event_id,
+                            event.command
+                        )
+                    %}
+
+                    <span class="severity-text
+                        {% if session_severity == 'Critical' %}
+                            critical-text
+                        {% elif session_severity == 'High' %}
+                            high-text
+                        {% elif session_severity == 'Medium' %}
+                            medium-text
+                        {% else %}
+                            low-text
+                        {% endif %}">
+                        {{ session_severity }}
+                    </span>
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+                <td colspan="4">
+                    No activity found for this session.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endif %}
+
+{% if report_type == "summary" and "attack_type" in included_sections %}
+                    
+                    <!-- ATTACK TYPE ANALYSIS -->
+<div class="report-section">
+
+    <h3>Attack Type Analysis</h3>
+
+    <p>
+        Recorded honeypot activity is grouped into security-related
+        behavior categories based on the observed event types and commands.
+    </p>
+
+    <table class="report-table">
+
+        <thead>
+            <tr>
+                <th>Attack / Activity Type</th>
+                <th>Events</th>
+                <th>Percentage</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td>Authentication Activity</td>
+                <td>
+                    {{ attack_type_counts["Authentication Activity"] }}
+                </td>
+                <td>
+                    {% if total_events > 0 %}
+                        {{ "%.1f"|format(
+                            attack_type_counts["Authentication Activity"]
+                            / total_events * 100
+                        ) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Reconnaissance Activity</td>
+                <td>
+                    {{ attack_type_counts["Reconnaissance Activity"] }}
+                </td>
+                <td>
+                    {% if total_events > 0 %}
+                        {{ "%.1f"|format(
+                            attack_type_counts["Reconnaissance Activity"]
+                            / total_events * 100
+                        ) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Command Execution</td>
+                <td>
+                    {{ attack_type_counts["Command Execution"] }}
+                </td>
+                <td>
+                    {% if total_events > 0 %}
+                        {{ "%.1f"|format(
+                            attack_type_counts["Command Execution"]
+                            / total_events * 100
+                        ) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </td>
+            </tr>
+
+            <tr>
+                <td>File / Download Activity</td>
+                <td>
+                    {{ attack_type_counts["File / Download Activity"] }}
+                </td>
+                <td>
+                    {% if total_events > 0 %}
+                        {{ "%.1f"|format(
+                            attack_type_counts["File / Download Activity"]
+                            / total_events * 100
+                        ) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Privilege / Account Activity</td>
+                <td>
+                    {{ attack_type_counts["Privilege / Account Activity"] }}
+                </td>
+                <td>
+                    {% if total_events > 0 %}
+                        {{ "%.1f"|format(
+                            attack_type_counts["Privilege / Account Activity"]
+                            / total_events * 100
+                        ) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Potential Shell Activity</td>
+                <td>
+                    {{ attack_type_counts["Potential Shell Activity"] }}
+                </td>
+                <td>
+                    {% if total_events > 0 %}
+                        {{ "%.1f"|format(
+                            attack_type_counts["Potential Shell Activity"]
+                            / total_events * 100
+                        ) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+{% endif %}
+
+
+                    <!-- SUMMARY -->
+                    
+                    {% if report_type == "summary" and "threat_severity" in included_sections %}
+                    
+                    <div class="report-section">
+
+                        <h3>Threat Summary</h3>
+
+                        <div class="summary-grid">
+
+                            <div class="summary-item">
+                                <strong>{{ severity_counts["Critical"] }}</strong>
+                                <span>Critical</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <strong>{{ severity_counts["High"] }}</strong>
+                                <span>High</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <strong>{{ severity_counts["Medium"] }}</strong>
+                                <span>Medium</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <strong>{{ severity_counts["Low"] }}</strong>
+                                <span>Low</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    
+                    {% endif %}
+                    
+                    {% if report_type == "summary" and "attack_sources" in included_sections %}
+
+
+                    <!-- TOP SOURCES -->
+                    <div class="report-section">
+
+                        <h3>Top Attack Sources</h3>
+
+                        <table class="report-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Source IP</th>
+                                    <th>Events</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for source in top_sources %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ source.src_ip }}
+                                    </td>
+
+                                    <td>
+                                        {{ source.total }}
+                                    </td>
+
+                                </tr>
+
+                                {% else %}
+
+                                <tr>
+                                    <td colspan="2">
+                                        No source data available.
+                                    </td>
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                    
+                    {% endif %}
+                    
+                    {% if report_type == "summary" and "event_summary" in included_sections %}
+
+
+                    <!-- EVENT SUMMARY -->
+                    <div class="report-section">
+
+                        <h3>Event Summary</h3>
+
+                        <table class="report-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Event ID</th>
+                                    <th>Count</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for item in event_summary %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ item.event_id }}
+                                    </td>
+
+                                    <td>
+                                        {{ item.total }}
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                    
+                    {% endif %}
+                    
+                    
+                    {% if report_type == "summary" and "commands" in included_sections %}
+
+
+                    <!-- COMMANDS -->
+                    <div class="report-section">
+
+                        <h3>Most Executed Commands</h3>
+
+                        <table class="report-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Command</th>
+                                    <th>Count</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for command in top_commands %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ command.command }}
+                                    </td>
+
+                                    <td>
+                                        {{ command.total }}
+                                    </td>
+
+                                </tr>
+
+                                {% else %}
+
+                                <tr>
+                                    <td colspan="2">
+                                        No command data available.
+                                    </td>
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                    
+                    {% endif %}
+                    
+            {% if report_type == "summary" and "evidence" in included_sections %}
+
+<div class="report-section">
+
+    <h3>Evidence</h3>
+
+    <p>
+        The captured evidence shows security-related activity detected during the selected SSH session:
+    </p>
+
+    <ul style="
+        margin: 10px 0 0 18px;
+        padding: 0;
+        color: #475569;
+        font-size: 12px;
+        line-height: 1.7;
+    ">
+        {% set evidence_types = [] %}
+
+    {% for event in report_evidence %}
+
+        {% if event.attack_type not in evidence_types %}
+            {% set _ = evidence_types.append(event.attack_type) %}
+        {% endif %}
+
+    {% endfor %}
+
+
+    {% if "Reconnaissance" in evidence_types %}
+
+    <li>
+        <strong>Reconnaissance:</strong>
+        Reconnaissance activity was observed in the selected SSH session,
+        including commands used to gather information about the honeypot
+        environment.
+    </li>
+
+    {% endif %}
+
+
+    {% if "File Download Activity" in evidence_types %}
+
+    <li>
+        <strong>File Download Activity:</strong>
+        File download activity was detected in the selected SSH session,
+        indicating an attempt to retrieve a file or resource.
+    </li>
+
+    {% endif %}
+
+
+    {% if "Potential Reverse Shell" in evidence_types %}
+
+    <li>
+        <strong>Potential Reverse Shell Activity:</strong>
+        Potential shell activity was detected in the selected SSH session,
+        including commands associated with interactive or network-based
+        shell activity.
+    </li>
+
+    {% endif %}
+
+
+    {% if "System Information / Credential Discovery" in evidence_types %}
+
+    <li>
+        <strong>System Information / Credential Discovery:</strong>
+        System information or credential discovery activity was detected
+        in the selected SSH session.
+    </li>
+
+    {% endif %}
+
+
+    {% if "Authentication Activity" in evidence_types %}
+
+    <li>
+        <strong>Authentication Activity:</strong>
+        Authentication activity was recorded during the selected SSH
+        session.
+    </li>
+
+    {% endif %}
+
+
+    {% if "Command Execution" in evidence_types %}
+
+    <li>
+        <strong>Command Execution:</strong>
+        Command execution activity was recorded during the selected SSH
+        session.
+    </li>
+
+    {% endif %}
+    </ul>
+
+    <p style="margin-top: 12px;">
+        These events were captured from the
+        <strong>
+            {{ report_evidence[0].src_ip if report_evidence else "N/A" }}
+        </strong>
+        source and automatically recorded by the honeypot. The system
+        assigns severity levels based on the detected event and command
+        patterns, allowing suspicious activities to be identified and
+        reviewed through the monitoring dashboard.
+    </p>
+
+
+    <h4 style="
+        margin: 20px 0 8px;
+        font-size: 13px;
+        color: #172033;
+    ">
+        Evidence Records
+    </h4>
+
+    <table class="report-table">
+
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Source IP</th>
+                <th>Attack / Activity Type</th>
+                <th>Command</th>
+                <th>Severity</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for event in report_evidence[:6] %}
+
+            <tr>
+
+                <td>
+                    {{ event.timestamp }}
+                </td>
+
+                <td>
+                    {{ event.src_ip or "N/A" }}
+                </td>
+
+                
+
+                    <td>
+    {{ event.attack_type }}
+</td>
+
+                
+
+                <td>
+                    {{ event.command or "-" }}
+                </td>
+
+                <td>
+                    <span class="severity-text
+                        {% if event.severity == 'Critical' %}
+                            critical-text
+                        {% elif event.severity == 'High' %}
+                            high-text
+                        {% elif event.severity == 'Medium' %}
+                            medium-text
+                        {% else %}
+                            low-text
+                        {% endif %}">
+                        {{ event.severity }}
+                    </span>
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+                <td colspan="5">
+                    No evidence records were found for this reporting period.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endif %}
+
+
+                    <div class="report-footer">
+
+                        Honeypot-Based Threat Monitoring &amp; Intrusion Analysis System
+                        <br>
+                        Generated by {{ username }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+</body>
+</html>

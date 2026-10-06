@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Access Denied | Cowrie</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b1220;
+            color: #e5e7eb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .access-container {
+            width: 100%;
+            max-width: 520px;
+            padding: 20px;
+        }
+
+        .access-card {
+            background: #17233b;
+            border: 1px solid #293a5a;
+            border-radius: 14px;
+            padding: 45px 40px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.12);
+            border: 2px solid rgba(239, 68, 68, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .access-card h1 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            color: #f8fafc;
+        }
+
+        .access-card .subtitle {
+            color: #94a3b8;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        .warning-box {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 10px;
+            padding: 15px 18px;
+            margin-bottom: 28px;
+            text-align: left;
+        }
+
+        .warning-title {
+            color: #f87171;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .warning-text {
+            color: #cbd5e1;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .user-info {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .user-info strong {
+            color: #60a5fa;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #24324d;
+            color: #cbd5e1;
+            border: 1px solid #344563;
+        }
+
+        .btn-secondary:hover {
+            background: #30405d;
+        }
+
+        .footer {
+            margin-top: 28px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .access-card {
+                padding: 35px 25px;
+            }
+
+            .access-card h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="access-container">
+
+        <div class="access-card">
+
+            <div class="icon">
+                🔒
+            </div>
+
+            <h1>Access Denied</h1>
+
+            <p class="subtitle">
+                You do not have the required permissions to access this page.
+            </p>
+
+            <div class="warning-box">
+                <div class="warning-title">
+                    Administrator Access Required
+                </div>
+
+                <div class="warning-text">
+                    This section is restricted to administrators.
+                    Staff accounts can monitor security events and
+                    analyse honeypot activity, but cannot manage system users.
+                </div>
+            </div>
+
+            {% if session.get("username") %}
+            <div class="user-info">
+                Logged in as:
+                <strong>{{ session.get("username") }}</strong>
+            </div>
+            {% endif %}
+
+            <div class="button-group">
+
+                <a href="/" class="btn btn-primary">
+                    Back to Dashboard
+                </a>
+
+                <a href="/logout" class="btn btn-secondary">
+                    Logout
+                </a>
+
+            </div>
+
+            <div class="footer">
+                Cowrie Threat Monitoring &amp; Intrusion Analysis System
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

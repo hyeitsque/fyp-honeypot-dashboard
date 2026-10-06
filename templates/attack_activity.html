@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Attack Activity | Cowrie Threat Monitoring</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0b1220;
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           LAYOUT
+        ========================= */
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            width: 250px;
+            background: #111a2b;
+            border-right: 1px solid #243047;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+        }
+
+        .brand {
+            height: 165px;
+            padding: 28px 24px;
+            border-bottom: 1px solid #243047;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            background: #1da1f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: #6f86a8;
+            margin-top: 4px;
+        }
+
+        .nav {
+            padding: 26px 10px;
+            flex: 1;
+        }
+
+        .nav-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #7084a5;
+            padding: 0 14px 12px;
+            text-transform: uppercase;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 14px 16px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            color: #89a0c3;
+            text-decoration: none;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #172743;
+            color: #ffffff;
+        }
+
+        .nav-item.active {
+            background: #1a3158;
+            color: #4da3ff;
+            border-left: 3px solid #338cff;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .logout-container {
+            border-top: 1px solid #243047;
+            padding: 18px 10px;
+        }
+
+        .logout {
+            color: #ff6b6b;
+        }
+
+        /* =========================
+           MAIN CONTENT
+        ========================= */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+        }
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        .topbar {
+            height: 74px;
+            background: #10192a;
+            border-bottom: 1px solid #243047;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+        }
+
+        .page-title {
+            font-size: 21px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .page-subtitle {
+            margin-top: 4px;
+            font-size: 13px;
+            color: #7084a5;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 15px;
+            border: 1px solid #1c4d3b;
+            border-radius: 20px;
+            color: #32d583;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #32d583;
+            box-shadow: 0 0 8px #32d583;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 18px;
+            border-left: 1px solid #243047;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #3987f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+        }
+
+        .username {
+            font-size: 14px;
+            color: #a7b7d0;
+        }
+
+        /* =========================
+           CONTENT
+        ========================= */
+
+        .content {
+            padding: 32px;
+        }
+
+        .heading {
+            margin-bottom: 26px;
+        }
+
+        .heading h1 {
+            font-size: 28px;
+            color: #ffffff;
+            margin-bottom: 7px;
+        }
+
+        .heading p {
+            color: #7186a7;
+            font-size: 14px;
+        }
+
+        /* =========================
+           SUMMARY CARDS
+        ========================= */
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: #162238;
+            border: 1px solid #263650;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .summary-label {
+            color: #7890b2;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+
+        .summary-value {
+            font-size: 27px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: 10px;
+        }
+
+        .summary-description {
+            color: #60799e;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* =========================
+           FILTER PANEL
+        ========================= */
+
+        .filter-panel {
+            background: #162238;
+            border: 1px solid #263650;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .filter-title {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: 1fr 230px auto auto;
+            gap: 12px;
+        }
+
+        .input,
+        .select {
+            width: 100%;
+            background: #0f192b;
+            border: 1px solid #2b3d5b;
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: #dbe5f4;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .input:focus,
+        .select:focus {
+            border-color: #3987f6;
+        }
+
+        .button {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            background: #2f7df4;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: #2469d4;
+        }
+
+        .clear-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 14px;
+            color: #8fa4c5;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .clear-button:hover {
+            color: white;
+        }
+
+        /* =========================
+           EVENTS PANEL
+        ========================= */
+
+        .events-panel {
+            background: #162238;
+            border: 1px solid #263650;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .events-header {
+            padding: 21px 22px;
+            border-bottom: 1px solid #293953;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .events-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .events-subtitle {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #7186a7;
+        }
+
+        .monitoring {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #32d583;
+            font-size: 13px;
+        }
+
+        .monitoring-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #32d583;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px 18px;
+            background: #121d30;
+            color: #6f86a8;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 17px 18px;
+            border-top: 1px solid #24334d;
+            color: #aebed5;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover {
+            background: #1a2941;
+        }
+
+        .timestamp {
+            color: #d9e3f2;
+        }
+
+        .source-ip {
+            color: #70b7ff;
+            font-family: monospace;
+        }
+
+        .protocol {
+            color: #aebed5;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .session {
+            color: #718caf;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        /* =========================
+           EVENT BADGES
+        ========================= */
+
+        .event-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #183c70;
+            color: #62adff;
+        }
+
+        .event-badge.success {
+            background: #123d31;
+            color: #42d99b;
+        }
+
+        .event-badge.warning {
+            background: #4a3517;
+            color: #f4b84a;
+        }
+
+        .event-badge.danger {
+            background: #4b2028;
+            color: #ff7181;
+        }
+
+        .event-badge.info {
+            background: #193b69;
+            color: #64aaff;
+        }
+
+        /* =========================
+           EMPTY STATE
+        ========================= */
+
+        .empty-state {
+            padding: 65px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 35px;
+            margin-bottom: 15px;
+            opacity: 0.6;
+        }
+
+        .empty-state h3 {
+            color: #dce6f4;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #6f86a8;
+            font-size: 13px;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .page-footer {
+            padding: 20px 0 5px;
+            color: #536987;
+            font-size: 11px;
+            text-align: right;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1000px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+                width: calc(100% - 220px);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .topbar {
+                padding: 0 20px;
+            }
+
+            .status {
+                display: none;
+            }
+        }
+        
+        /* Threat Severity Badges */
+
+.severity-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.severity-critical {
+    color: #ff5c5c;
+    background: rgba(255, 92, 92, 0.12);
+    border: 1px solid rgba(255, 92, 92, 0.25);
+}
+
+.severity-high {
+    color: #ff8a1f;
+    background: rgba(255, 138, 31, 0.12);
+    border: 1px solid rgba(255, 138, 31, 0.25);
+}
+
+.severity-medium {
+    color: #f2c94c;
+    background: rgba(242, 201, 76, 0.12);
+    border: 1px solid rgba(242, 201, 76, 0.25);
+}
+
+.severity-low {
+    color: #2ecc71;
+    background: rgba(46, 204, 113, 0.12);
+    border: 1px solid rgba(46, 204, 113, 0.25);
+}
+
+/* =========================================================
+   STANDARD SIDEBAR
+   ========================================================= */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+
+    background: #111a2b;
+    border-right: 1px solid #243047;
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 1000;
+}
+
+.sidebar-logo {
+    padding: 24px 20px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    border-bottom: 1px solid #243047;
+}
+
+.sidebar-logo-icon {
+    width: 42px;
+    height: 42px;
+
+    background: linear-gradient(
+        135deg,
+        #3b82f6,
+        #22d3ee
+    );
+
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+}
+
+.sidebar-logo-text h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.sidebar-logo-text span {
+    display: block;
+    margin-top: 3px;
+    font-size: 11px;
+    color: #64748b;
+}
+
+.sidebar-nav {
+    padding: 20px 12px;
+    flex: 1;
+}
+
+.nav-section-title {
+    padding: 0 12px;
+    margin-bottom: 10px;
+
+    color: #64748b;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 12px 14px;
+    margin-bottom: 5px;
+
+    color: #94a3b8;
+
+    text-decoration: none;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+.nav-item:hover {
+    background: #17233b;
+    color: #e5e7eb;
+}
+
+.nav-item.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+
+    border-left: 3px solid #3b82f6;
+}
+
+.nav-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.sidebar-bottom {
+    padding: 15px 12px;
+    border-top: 1px solid #243047;
+}
+
+.logout-link {
+    color: #f87171;
+}
+
+.logout-link:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+}
+
+.view-details {
+    display: inline-block;
+    padding: 7px 12px;
+    background: #2563eb;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.view-details:hover {
+    background: #1d4ed8;
+}
+        
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+<aside class="sidebar">
+
+    <div class="sidebar-logo">
+
+        <div class="sidebar-logo-icon">
+            🛡
+        </div>
+
+        <div class="sidebar-logo-text">
+            <h2>Cowrie</h2>
+            <span>Threat Monitoring</span>
+        </div>
+
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <div class="nav-section-title">
+            Monitoring
+        </div>
+
+        <a href="/" class="nav-item">
+            <span class="nav-icon">▣</span>
+            Dashboard
+        </a>
+
+        <a href="/attack-activity" class="nav-item active">
+            <span class="nav-icon">⚠</span>
+            Attack Activity
+        </a>
+
+        <a href="/sessions" class="nav-item">
+            <span class="nav-icon">◉</span>
+            Sessions
+        </a>
+
+        <a href="/analytics" class="nav-item">
+            <span class="nav-icon">⌁</span>
+            Analytics
+        </a>
+        
+        <a href="/alerts" class="nav-item">
+    <span class="nav-icon">⚠</span>
+    Alerts
+</a>
+        
+        <div class="nav-section-title" style="margin-top:25px;">
+    Reporting
+</div>
+
+<a href="/reports" class="nav-item">
+    <span class="nav-icon">▤</span>
+    Reports
+</a>
+
+        <div class="nav-section-title" style="margin-top: 25px;">
+            System
+        </div>
+
+        {% if session.get("role") == "admin" %}
+        <a href="/settings" class="nav-item">
+            <span class="nav-icon">⚙</span>
+            Settings
+        </a>
+        {% endif %}
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+        <a href="/logout" class="nav-item logout-link">
+            <span class="nav-icon">↪</span>
+            Logout
+        </a>
+
+    </div>
+
+</aside>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main class="main">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+                <div class="page-title">
+                    Attack Activity
+                </div>
+
+                <div class="page-subtitle">
+                    Honeypot-Based Threat Monitoring & Intrusion Analysis System
+                </div>
+            </div>
+
+            <div class="top-right">
+
+                <div class="status">
+                    <span class="status-dot"></span>
+                    System Online
+                </div>
+
+                <div class="user">
+
+            <div class="avatar">
+                {{ username[0]|upper if username else "U" }}
+            </div>
+
+            <div class="username">
+                <span>
+    <strong>{{ username }}</strong>
+    <small style="display:block; color:#7890b5; margin-top:2px;">
+        {{ role|capitalize }}
+    </small>
+</span>
+            </div>
+
+        </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <section class="content">
+
+            <div class="heading">
+
+                <h1>Attack Activity</h1>
+
+                <p>
+                    Monitor, search and investigate events collected from the Cowrie honeypot.
+                </p>
+
+            </div>
+
+
+            <!-- SUMMARY -->
+
+            <div class="summary">
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Recorded Events
+                    </div>
+
+                    <div class="summary-value">
+                        {{ events|length }}
+                    </div>
+
+                    <div class="summary-description">
+                        Events currently displayed
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Monitoring Status
+                    </div>
+
+                    <div class="summary-value" style="color:#32d583;">
+                        Active
+                    </div>
+
+                    <div class="summary-description">
+                        Honeypot monitoring interface
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Maximum Records
+                    </div>
+
+                    <div class="summary-value">
+                        100
+                    </div>
+
+                    <div class="summary-description">
+                        Most recent events loaded
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTER -->
+
+            <div class="filter-panel">
+
+                <div class="filter-title">
+                    Event Search & Filtering
+                </div>
+
+                <form method="GET"
+                      action="{{ url_for('attack_activity') }}"
+                      class="filter-form">
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="input"
+                        placeholder="Search IP address, event or session..."
+                        value="{{ search }}"
+                    >
+
+                    <select name="event" class="select">
+
+                        <option value="">
+                            All Events
+                        </option>
+
+                        {% for event_type in event_types %}
+
+                        <option
+                            value="{{ event_type.event_id }}"
+                            {% if event_filter == event_type.event_id %}selected{% endif %}
+                        >
+                            {{ event_type.event_id }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <button type="submit" class="button">
+                        Apply Filter
+                    </button>
+
+                    <a
+                        href="{{ url_for('attack_activity') }}"
+                        class="clear-button"
+                    >
+                        Clear
+                    </a>
+
+                </form>
+
+            </div>
+
+
+            <!-- EVENTS -->
+
+            <div class="events-panel">
+
+                <div class="events-header">
+
+                    <div>
+
+                        <div class="events-title">
+                            Honeypot Events
+                        </div>
+
+                        <div class="events-subtitle">
+                            Latest activity collected from Cowrie
+                        </div>
+
+                    </div>
+
+                    <div class="monitoring">
+                        <span class="monitoring-dot"></span>
+                        Monitoring
+                    </div>
+
+                </div>
+
+
+                {% if events %}
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Timestamp</th>
+
+                                <th>Source IP</th>
+
+                                <th>Event</th>
+                                
+                                <th>SEVERITY</th>
+
+                                <th>Protocol</th>
+
+                                <th>Session</th>
+                                
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for event in events %}
+
+                            <tr>
+
+                                <td class="timestamp">
+                                    {{ event.timestamp }}
+                                </td>
+
+
+                                <td class="source-ip">
+                                    {{ event.src_ip or "N/A" }}
+                                </td>
+
+
+                                <td>
+
+                                    {% if event.event_id == "cowrie.login.success" %}
+
+                                    <span class="event-badge success">
+                                        Authentication Success
+                                    </span>
+
+                                    {% elif event.event_id == "cowrie.login.failed" %}
+
+                                    <span class="event-badge danger">
+                                        Authentication Failed
+                                    </span>
+
+                                    {% elif event.event_id == "cowrie.command.failed" %}
+
+                                    <span class="event-badge danger">
+                                        Command Failed
+                                    </span>
+
+                                    {% elif event.event_id == "cowrie.command.input" %}
+
+                                    <span class="event-badge info">
+                                        Command Executed
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="event-badge">
+                                        {{ event.event_id or "Unknown Event" }}
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+                                
+                                <td>
+                                    <span class="severity-badge severity-{{ event.severity|lower }}">
+                                        {{ event.severity }}
+                                    </span>
+                                </td>
+
+
+                                <td class="protocol">
+                                    {{ event.protocol or "SSH" }}
+                                </td>
+
+
+                                <td class="session">
+                                    {{ event.session_id or "N/A" }}
+                                </td>
+                                
+                                <td>
+                                    <a href="/event/{{ event.id }}" class="view-details">
+                                        View Details
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        ◉
+                    </div>
+
+                    <h3>
+                        No Attack Activity Found
+                    </h3>
+
+                    <p>
+                        No events match the current search or filter.
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="page-footer">
+                Cowrie Threat Monitoring System · Intrusion Analysis
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

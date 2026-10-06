@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cowrie Threat Monitoring Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+          
+          
+    <style>
+
+    .clickable-card {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+        transition: transform 0.2s ease,
+                    border-color 0.2s ease,
+                    background 0.2s ease;
+    }
+
+    .clickable-card:hover {
+        transform: translateY(-2px);
+        border-color: #3b82f6;
+        background: #1b2943;
+    }
+    
+    .severity-link,
+.severity-link:visited {
+    text-decoration: none;
+    color: #e5e7eb;
+    cursor: pointer;
+}
+
+.severity-link:hover {
+    text-decoration: none;
+    color: #ffffff;
+    background: #14223b;
+}
+
+.panel-action,
+.panel-action:visited {
+    color: #60a5fa;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.panel-action:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+.recent-activity-panel {
+    margin-top: 24px !important;
+}
+
+.dashboard-grid {
+    margin-bottom: 20px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 20px;
+    align-items: stretch;
+}
+
+
+
+</style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     SIDEBAR
+     ===================================================== -->
+
+<aside class="sidebar">
+
+    <div class="sidebar-logo">
+
+        <div class="sidebar-logo-icon">
+            🛡
+        </div>
+
+        <div class="sidebar-logo-text">
+            <h2>Cowrie</h2>
+            <span>Threat Monitoring</span>
+        </div>
+
+    </div>
+
+
+    <nav class="sidebar-nav">
+
+        <div class="nav-section-title">
+            Monitoring
+        </div>
+
+        <a href="/" class="nav-item active">
+            <span class="nav-icon">▣</span>
+            Dashboard
+        </a>
+
+        <a href="/attack-activity" class="nav-item">
+            <span class="nav-icon">⚠</span>
+            Attack Activity
+        </a>
+
+        <a href="/sessions" class="nav-item">
+            <span class="nav-icon">◉</span>
+            Sessions
+        </a>
+
+        <a href="/analytics" class="nav-item">
+            <span class="nav-icon">⌁</span>
+            Analytics
+        </a>
+        
+        <a href="/alerts" class="nav-item">
+    <span class="nav-icon">⚠</span>
+    Alerts
+</a>
+        
+        <div class="nav-section-title" style="margin-top:25px;">
+    Reporting
+</div>
+
+<a href="/reports" class="nav-item">
+    <span class="nav-icon">▤</span>
+    Reports
+</a>
+
+
+        <div class="nav-section-title" style="margin-top: 25px;">
+            System
+        </div>
+
+        {% if session.get("role") == "admin" %}
+        <a href="/settings" class="nav-item">
+            <span class="nav-icon">⚙</span>
+            Settings
+        </a>
+        {% endif %}
+
+    </nav>
+
+
+    <div class="sidebar-bottom">
+
+        <a href="/logout" class="nav-item logout-link">
+            <span class="nav-icon">↪</span>
+            Logout
+        </a>
+
+    </div>
+
+</aside>
+
+
+<!-- =====================================================
+     MAIN CONTENT
+     ===================================================== -->
+
+<main class="main-content">
+
+
+    <!-- =================================================
+         TOP BAR
+         ================================================= -->
+
+    <header class="topbar">
+
+        <div class="topbar-title">
+
+            <h1>Security Dashboard</h1>
+
+            <p>
+                Honeypot-Based Threat Monitoring &amp; Intrusion Analysis System
+            </p>
+
+        </div>
+
+
+        <div class="user-area">
+
+            <div class="status-indicator">
+
+                <span class="status-dot"></span>
+
+                System Online
+
+        </div>
+
+
+            <div class="user-badge">
+
+    <div class="user-avatar">
+        {{ username[0]|upper }}
+    </div>
+
+    <span>
+        <strong>{{ username }}</strong>
+
+        <small style="
+            display: block;
+            color: #7890b5;
+            margin-top: 2px;
+            font-size: 10px;
+        ">
+            {{ role|capitalize }}
+        </small>
+    </span>
+
+</div>
+
+</div>
+
+        
+
+    </header>
+
+
+    <!-- =================================================
+         DASHBOARD CONTENT
+         ================================================= -->
+
+    <section class="content">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <h2>Security Overview</h2>
+
+            <p>
+                Real-time overview of activity collected from the Cowrie honeypot.
+            </p>
+
+        </div>
+
+
+<!-- =================================================
+     STATISTIC CARDS
+     ================================================= -->
+
+<div class="stats-grid">
+
+
+    <!-- TOTAL EVENTS -->
+
+    <div class="stat-card">
+
+        <div class="stat-header">
+
+            <div class="stat-label">
+                Total Events
+            </div>
+
+            <div class="stat-icon blue">
+                ◈
+            </div>
+
+        </div>
+
+        <div class="stat-value">
+            {{ total_events }}
+        </div>
+
+        <div class="stat-description">
+            Recorded honeypot events
+        </div>
+
+    </div>
+
+
+    <!-- TOTAL SESSIONS -->
+
+    <div class="stat-card">
+
+        <div class="stat-header">
+
+            <div class="stat-label">
+                Total Sessions
+            </div>
+
+            <div class="stat-icon orange">
+                ◉
+            </div>
+
+        </div>
+
+        <div class="stat-value">
+            {{ total_sessions }}
+        </div>
+
+        <div class="stat-description">
+            Unique SSH sessions
+        </div>
+
+    </div>
+
+
+    <!-- SUCCESSFUL LOGINS -->
+
+    <div class="stat-card">
+
+        <div class="stat-header">
+
+            <div class="stat-label">
+                Successful Logins
+            </div>
+
+            <div class="stat-icon green">
+                ✓
+            </div>
+
+        </div>
+
+        <div class="stat-value">
+            {{ successful_logins }}
+        </div>
+
+        <div class="stat-description">
+            Successful authentication attempts
+        </div>
+
+    </div>
+
+
+    <!-- FAILED COMMANDS -->
+
+    <div class="stat-card">
+
+        <div class="stat-header">
+
+            <div class="stat-label">
+                Failed Commands
+            </div>
+
+            <div class="stat-icon red">
+                !
+            </div>
+
+        </div>
+
+        <div class="stat-value">
+            {{ failed_commands }}
+        </div>
+
+        <div class="stat-description">
+            Commands rejected by Cowrie
+        </div>
+
+    </div>
+
+
+</div>
+
+
+        <!-- =================================================
+             ANALYSIS PANELS
+             ================================================= -->
+
+        <div class="dashboard-grid">
+
+
+            <!-- ATTACK ACTIVITY -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <div class="panel-title">
+                            Attack Activity
+                        </div>
+
+                        <div class="panel-subtitle">
+                            Recent honeypot activity
+                        </div>
+
+                    </div>
+
+                    <span class="badge badge-info">
+                        SSH
+                    </span>
+
+                </div>
+
+
+                <div class="panel-body">
+
+                    <div style="
+                        height: 320px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #64748b;
+                        text-align: center;
+                    ">
+
+
+
+<div style="height: 320px; width: 100%;">
+    <canvas id="attackTrendChart"></canvas>
+</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                
+
+            
+
+
+            <!-- THREAT SEVERITY -->
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <div class="panel-title">
+                Threat Severity
+            </div>
+
+            <div class="panel-subtitle">
+                Current threat classification
+            </div>
+
+        </div>
+
+        <a href="/alerts"
+           class="panel-action">
+
+            Review Alerts →
+
+        </a>
+
+    </div>
+
+
+    <div class="panel-body">
+
+        <div class="severity-list">
+
+
+            <!-- CRITICAL -->
+
+            <div class="severity-row">
+
+                <div class="severity-info">
+
+                    <span class="severity-dot critical"></span>
+
+                    Critical
+
+                </div>
+
+                <span class="severity-count">
+                    {{ severity_counts["Critical"] }}
+                </span>
+
+            </div>
+
+
+            <!-- HIGH -->
+
+            <div class="severity-row">
+
+                <div class="severity-info">
+
+                    <span class="severity-dot high"></span>
+
+                    High
+
+                </div>
+
+                <span class="severity-count">
+                    {{ severity_counts["High"] }}
+                </span>
+
+            </div>
+
+
+            <!-- MEDIUM -->
+
+            <div class="severity-row">
+
+                <div class="severity-info">
+
+                    <span class="severity-dot medium"></span>
+
+                    Medium
+
+                </div>
+
+                <span class="severity-count">
+                    {{ severity_counts["Medium"] }}
+                </span>
+
+            </div>
+
+
+            <!-- LOW -->
+
+            <div class="severity-row">
+
+                <div class="severity-info">
+
+                    <span class="severity-dot low"></span>
+
+                    Low
+
+                </div>
+
+                <span class="severity-count">
+                    {{ severity_counts["Low"] }}
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+</div>
+
+
+        <!-- =================================================
+             RECENT ATTACK ACTIVITY
+             ================================================= -->
+
+        <div class="panel recent-activity-panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <div class="panel-title">
+                        Recent Attack Activity
+                    </div>
+
+                    <div class="panel-subtitle">
+                        Latest events collected from Cowrie
+                    </div>
+
+                </div>
+
+                <span class="badge badge-success">
+                    Live Data
+                </span>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table class="attack-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Timestamp</th>
+
+                            <th>Source IP</th>
+
+                            <th>Protocol</th>
+
+                            <th>Event</th>
+                            
+                            <th>Severity</th>
+
+                            <th>Command</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    {% for event in recent_events %}
+
+                        <tr>
+
+                            <td>
+                                {{ event.timestamp }}
+                            </td>
+
+                            <td>
+
+                                <span class="ip-address">
+                                    {{ event.src_ip }}
+                                </span>
+
+                            </td>
+
+                            <td>
+                                {{ event.protocol }}
+                            </td>
+
+                            <td>
+
+                                {% if event.event_id == 'cowrie.login.success' %}
+
+                                    <span class="badge badge-success">
+                                        Login Success
+                                    </span>
+
+                                {% elif event.event_id == 'cowrie.command.failed' %}
+
+                                    <span class="badge badge-failed">
+                                        Command Failed
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge badge-info">
+                                        {{ event.event_id }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+                            
+                            <td>
+
+                                    <span class="severity-badge severity-{{ event.severity|lower }}">
+                                        {{ event.severity }}
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                {% if event.command %}
+
+                                    <span class="command">
+                                        {{ event.command }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span style="color: #64748b;">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% else %}
+
+                        <tr>
+
+                            <td colspan="6">
+
+                                <div class="empty-state">
+
+                                    <div class="empty-state-icon">
+                                        🔍
+                                    </div>
+
+                                    No attack activity recorded yet.
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <footer class="dashboard-footer">
+
+            Cowrie Threat Monitoring &amp; Intrusion Analysis System
+            <br>
+
+            Honeypot Monitoring Platform
+
+        </footer>
+
+
+    </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const trendLabels = {{ trend_labels | tojson }}.map(label => label.substring(11, 16));
+    const trendValues = {{ trend_values | tojson }};
+
+    const ctx = document.getElementById('attackTrendChart');
+
+new Chart(ctx, {
+    type: 'line',
+
+    data: {
+        labels: trendLabels,
+        datasets: [{
+            label: 'Attack Events',
+            data: trendValues,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.15)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.35,
+            pointRadius: 5,
+            pointHoverRadius: 8
+        }]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        interaction: {
+            intersect: false,
+            mode: 'index'
+        },
+
+    plugins: {
+	legend: {
+            display: true,
+            onClick: function () {},
+            labels: {
+                color: '#e5e7eb',
+                usePointStyle: false
+        }
+    },
+
+            tooltip: {
+                enabled: true
+            }
+        },
+
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Time',
+                    color: '#94a3b8'
+                },
+                ticks: {
+                    color: '#94a3b8',
+		    maxTicksLimit: 8,
+		    autoSkip: true,
+		    maxRotation: 0,
+		    minRotation: 0
+                },
+                grid: {
+                    color: 'rgba(148, 163, 184, 0.08)'
+                }
+            },
+
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Number of Events',
+                    color: '#94a3b8'
+                },
+                ticks: {
+                    color: '#94a3b8',
+                    precision: 0
+                },
+                grid: {
+                    color: 'rgba(148, 163, 184, 0.08)'
+                }
+            }
+        }
+    }
+});
+
+
+</script>
+
+</body>
+</html>

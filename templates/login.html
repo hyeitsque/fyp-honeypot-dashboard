@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Login - Honeypot-Based Threat Monitoring and Intrusion Analysis System
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            margin: 0;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at 15% 30%,
+                    rgba(37, 99, 235, 0.14),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 85% 70%,
+                    rgba(34, 211, 238, 0.06),
+                    transparent 28%
+                ),
+                #070d18;
+
+            color: #e5e7eb;
+
+            overflow: hidden;
+        }
+
+
+        /* =====================================================
+           BACKGROUND GRID
+           ===================================================== */
+
+        .background-grid {
+            position: fixed;
+            inset: 0;
+
+            background-image:
+                linear-gradient(
+                    rgba(59, 130, 246, 0.035) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(59, 130, 246, 0.035) 1px,
+                    transparent 1px
+                );
+
+            background-size: 45px 45px;
+
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           PAGE
+           ===================================================== */
+
+        .page {
+            position: relative;
+
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 40px;
+        }
+
+
+        .shell {
+            width: 100%;
+            max-width: 1120px;
+
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+
+            min-height: 640px;
+
+            background: rgba(12, 21, 37, 0.90);
+
+            border: 1px solid #263752;
+
+            border-radius: 18px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.45);
+
+            backdrop-filter: blur(14px);
+        }
+
+
+        /* =====================================================
+           LEFT PANEL
+           ===================================================== */
+
+        .hero {
+            position: relative;
+
+            padding: 54px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #0f1d34,
+                    #0b1425 70%
+                );
+
+            border-right: 1px solid #263752;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+
+        .hero::after {
+            content: "";
+
+            position: absolute;
+
+            width: 280px;
+            height: 280px;
+
+            right: -110px;
+            bottom: -100px;
+
+            border-radius: 50%;
+
+            border: 1px solid rgba(59, 130, 246, 0.12);
+
+            box-shadow:
+                0 0 0 40px rgba(59, 130, 246, 0.025),
+                0 0 0 80px rgba(59, 130, 246, 0.018);
+
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           BRAND
+           ===================================================== */
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 52px;
+            height: 52px;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #22d3ee
+                );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: white;
+
+            font-size: 25px;
+
+            box-shadow:
+                0 10px 28px rgba(37, 99, 235, 0.20);
+        }
+
+        .brand-name {
+            color: #ffffff;
+
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .brand-subtitle {
+            margin-top: 3px;
+
+            color: #64748b;
+
+            font-size: 10px;
+
+            letter-spacing: 0.4px;
+        }
+
+
+        /* =====================================================
+           HERO CONTENT
+           ===================================================== */
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+
+            max-width: 540px;
+        }
+
+        .hero-eyebrow {
+            margin-bottom: 14px;
+
+            color: #60a5fa;
+
+            font-size: 10px;
+            font-weight: 700;
+
+            letter-spacing: 1.7px;
+
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            margin: 0;
+
+            color: #ffffff;
+
+            font-size: 39px;
+
+            line-height: 1.13;
+
+            font-weight: 700;
+        }
+
+        .hero-title span {
+            color: #60a5fa;
+        }
+
+        .hero-description {
+            margin-top: 20px;
+
+            max-width: 490px;
+
+            color: #8da3c4;
+
+            font-size: 13px;
+
+            line-height: 1.8;
+        }
+
+
+        /* =====================================================
+           FEATURES
+           ===================================================== */
+
+        .feature-list {
+            margin-top: 28px;
+
+            display: grid;
+
+            gap: 12px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+
+            gap: 11px;
+
+            color: #b8c7da;
+
+            font-size: 12px;
+        }
+
+        .feature-icon {
+            width: 25px;
+            height: 25px;
+
+            border-radius: 6px;
+
+            background: rgba(59, 130, 246, 0.10);
+
+            border: 1px solid rgba(59, 130, 246, 0.16);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #60a5fa;
+
+            font-size: 11px;
+        }
+
+
+        /* =====================================================
+           HERO FOOTER
+           ===================================================== */
+
+        .hero-footer {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            color: #52657f;
+
+            font-size: 9px;
+        }
+
+        .footer-line {
+            width: 30px;
+            height: 1px;
+
+            background: #29405f;
+        }
+
+
+        /* =====================================================
+           LOGIN PANEL
+           ===================================================== */
+
+        .login-section {
+            padding: 54px 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #0d1728;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 360px;
+        }
+
+
+        /* =====================================================
+           LOGIN HEADER
+           ===================================================== */
+
+        .login-header {
+            margin-bottom: 28px;
+        }
+
+        .login-header h2 {
+            margin: 0;
+
+            color: #ffffff;
+
+            font-size: 25px;
+        }
+
+        .login-header p {
+            margin: 8px 0 0;
+
+            color: #7890b5;
+
+            font-size: 11px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =====================================================
+           ERROR
+           ===================================================== */
+
+        .login-error {
+            margin-bottom: 18px;
+
+            padding: 11px 13px;
+
+            background: rgba(239, 68, 68, 0.08);
+
+            border: 1px solid rgba(239, 68, 68, 0.24);
+
+            border-left: 3px solid #ef4444;
+
+            border-radius: 7px;
+
+            color: #fca5a5;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           FORM
+           ===================================================== */
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #8da3c4;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.9px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+
+            padding: 13px 13px;
+
+            background: #091222;
+
+            border: 1px solid #2a3d5b;
+
+            border-radius: 7px;
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .form-input::placeholder {
+            color: #536984;
+        }
+
+        .form-input:hover {
+            border-color: #3a4e6f;
+        }
+
+        .form-input:focus {
+            outline: none;
+
+            background: #0b1628;
+
+            border-color: #3b82f6;
+
+            box-shadow:
+                0 0 0 3px rgba(59, 130, 246, 0.10);
+        }
+
+        .password-input {
+            padding-right: 45px;
+        }
+
+
+        /* =====================================================
+           PASSWORD BUTTON
+           ===================================================== */
+
+        .password-toggle {
+            position: absolute;
+
+            top: 50%;
+            right: 9px;
+
+            transform: translateY(-50%);
+
+            border: none;
+
+            background: transparent;
+
+            color: #64748b;
+
+            cursor: pointer;
+
+            padding: 6px;
+
+            font-size: 13px;
+        }
+
+        .password-toggle:hover {
+            color: #93a8c6;
+        }
+
+
+        /* =====================================================
+           SIGN IN
+           ===================================================== */
+
+        .login-button {
+            width: 100%;
+
+            margin-top: 5px;
+
+            padding: 13px 15px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #3478ef
+                );
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 10px 22px rgba(37, 99, 235, 0.15);
+
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.2s ease,
+                filter 0.2s ease;
+        }
+
+        .login-button:hover {
+            transform: translateY(-1px);
+
+            filter: brightness(1.05);
+
+            box-shadow:
+                0 13px 28px rgba(37, 99, 235, 0.22);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+
+        /* =====================================================
+           SECURITY STATUS
+           ===================================================== */
+
+        .security-status {
+            margin-top: 20px;
+
+            padding: 13px 14px;
+
+            background: #111d31;
+
+            border: 1px solid #243652;
+
+            border-radius: 7px;
+
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            color: #7086a5;
+
+            font-size: 9px;
+        }
+
+        .security-status-dot {
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #22c55e;
+
+            box-shadow:
+                0 0 8px rgba(34, 197, 94, 0.55);
+        }
+
+        .security-status strong {
+            color: #a7bad4;
+        }
+
+
+        /* =====================================================
+           LOGIN FOOTER
+           ===================================================== */
+
+        .login-footer {
+            margin-top: 22px;
+
+            text-align: center;
+
+            color: #455873;
+
+            font-size: 9px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 900px) {
+
+            body {
+                overflow: auto;
+            }
+
+            .page {
+                padding: 20px;
+            }
+
+            .shell {
+                grid-template-columns: 1fr;
+                max-width: 520px;
+                min-height: auto;
+            }
+
+            .hero {
+                min-height: 360px;
+                padding: 35px;
+                border-right: none;
+                border-bottom: 1px solid #263752;
+            }
+
+            .hero-title {
+                font-size: 30px;
+            }
+
+            .login-section {
+                padding: 35px;
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .page {
+                padding: 10px;
+            }
+
+            .hero {
+                padding: 28px;
+            }
+
+            .login-section {
+                padding: 28px 22px;
+            }
+
+            .hero-title {
+                font-size: 27px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="background-grid"></div>
+
+
+<div class="page">
+
+
+    <div class="shell">
+
+
+        <!-- =================================================
+             BRAND / HERO
+             ================================================= -->
+
+        <section class="hero">
+
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    🛡
+                </div>
+
+                <div>
+
+                    <div class="brand-name">
+                        Cowrie
+                    </div>
+
+                    <div class="brand-subtitle">
+                        Security Monitoring Platform
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="hero-content">
+
+                <div class="hero-eyebrow">
+                    Honeypot Security Platform
+                </div>
+
+                <h1 class="hero-title">
+
+                    Honeypot-Based
+                    <br>
+
+                    <span>
+                        Threat Monitoring
+                    </span>
+
+                    <br>
+
+                    and Intrusion Analysis System
+
+                </h1>
+
+
+                <p class="hero-description">
+
+                    Centralized monitoring and analysis of security
+                    activities collected from the Cowrie honeypot,
+                    including attack events, threat severity,
+                    sessions and investigation evidence.
+
+                </p>
+
+
+                <div class="feature-list">
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            ●
+                        </div>
+
+                        Threat Monitoring
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            ◇
+                        </div>
+
+                        Intrusion Analysis
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            ◉
+                        </div>
+
+                        SSH Session Investigation
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            ▤
+                        </div>
+
+                        Security Reporting
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <div class="hero-footer">
+
+                <span class="footer-line"></span>
+
+                Cowrie Honeypot Monitoring Platform
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             LOGIN
+             ================================================= -->
+
+        <section class="login-section">
+
+
+            <div class="login-container">
+
+
+                <div class="login-header">
+
+                    <h2>
+                        Welcome Back
+                    </h2>
+
+                    <p>
+                        Sign in to access the security monitoring
+                        and intrusion analysis dashboard.
+                    </p>
+
+                </div>
+
+
+                {% if error %}
+
+                    <div class="login-error">
+                        {{ error }}
+                    </div>
+
+                {% endif %}
+
+
+                <form
+                    method="POST"
+                    action="/login"
+                >
+
+
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="username"
+                        >
+                            Username
+                        </label>
+
+
+                        <input
+                            id="username"
+                            class="form-input"
+                            type="text"
+                            name="username"
+                            placeholder="Enter your username"
+                            autocomplete="username"
+                            required
+                            autofocus
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label
+                            class="form-label"
+                            for="password"
+                        >
+                            Password
+                        </label>
+
+
+                        <div class="input-wrapper">
+
+                            <input
+                                id="password"
+                                class="form-input password-input"
+                                type="password"
+                                name="password"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required
+                            >
+
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                onclick="togglePassword()"
+                                aria-label="Show password"
+                            >
+                                ◉
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="login-button"
+                    >
+                        Sign In to Security Console
+                    </button>
+
+
+                </form>
+
+
+                <div class="security-status">
+
+                    <span class="security-status-dot"></span>
+
+                    <span>
+                        <strong>Authorized access only.</strong>
+                        Monitoring console protected by authentication.
+                    </span>
+
+                </div>
+
+
+                <div class="login-footer">
+
+                    Honeypot-Based Threat Monitoring and Intrusion Analysis System
+                    <br>
+
+                    Cowrie Security Platform
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+    function togglePassword() {
+
+        const password =
+            document.getElementById("password");
+
+        const toggle =
+            document.querySelector(".password-toggle");
+
+
+        if (password.type === "password") {
+
+            password.type = "text";
+
+            toggle.textContent = "◉";
+
+            toggle.setAttribute(
+                "aria-label",
+                "Hide password"
+            );
+
+        } else {
+
+            password.type = "password";
+
+            toggle.textContent = "◉";
+
+            toggle.setAttribute(
+                "aria-label",
+                "Show password"
+            );
+
+        }
+
+    }
+
+</script>
+
+
+</body>
+
+</html>
