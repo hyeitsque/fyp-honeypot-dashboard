@@ -328,7 +328,10 @@ def get_db_connection():
         user=os.environ["DB_USER"],
         password=os.environ["DB_PASSWORD"],
         database=os.environ["DB_NAME"],
-        port=int(os.environ.get("DB_PORT", 3306))
+        port=int(os.environ.get("DB_PORT", 4000)),
+        ssl_ca=os.path.join(os.path.dirname(__file__), "ca.pem"),
+        ssl_verify_cert=True,
+        ssl_verify_identity=True
     )
 
 
